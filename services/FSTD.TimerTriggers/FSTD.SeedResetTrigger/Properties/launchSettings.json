@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "FSTD.SeedResetTrigger": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7022"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "httpPort": 33394,
+      "useSSL": false
+    }
+  }
+}

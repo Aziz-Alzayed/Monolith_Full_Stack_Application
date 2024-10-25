@@ -1,0 +1,44 @@
+# Required Inputs:
+# - azure_functionapp_name: The name of your Azure Function App.
+# - env: "prd" | "dev"
+# - image_tag: The tag of the image to be deployed.
+# - repo_name: The name of the repository in Azure Container Registry.
+
+name: Reusable Deploy .Net Docker Project
+
+on:
+  workflow_call:
+    inputs:
+      azure_functionapp_name:
+        required: true
+        type: string
+      env:
+        required: true
+        type: string
+      image_tag:
+        required: true
+        type: string
+      repo_name:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.env }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Function App (Warm-Up Slot)
+        run: |
+          az functionapp config container set --name ${{ inputs.azure_functionapp_name }} --resource-group ${{ secrets.SERVICES_RESOURCE_GROUP_NAME }} --slot warm-up --image ${{ secrets.ACR_LOGIN_SERVER }}/${{ inputs.repo_name }}:${{ inputs.image_tag }}
+
+      - name: Swap Slots
+        run: |
+          az functionapp deployment slot swap --resource-group ${{ secrets.SERVICES_RESOURCE_GROUP_NAME }} --name ${{ inputs.azure_functionapp_name }} --slot warm-up --target-slot production

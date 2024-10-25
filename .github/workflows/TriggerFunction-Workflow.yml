@@ -1,0 +1,41 @@
+name: CI/CD Pipeline Trigger Function
+
+on:
+  # Trigger the workflow on push to the main branch (only on merges)
+  push:
+    branches:
+      - main
+  # Allow manually triggering the workflow
+  workflow_dispatch:
+
+jobs:
+  # Step 1: Set environment variables
+  set-vars:
+    runs-on: ubuntu-latest
+    outputs:
+      repository_name: "fstd-trigger-function"   # Setting repository name for the build job
+      azure_webapp_name: "fstd-app-service-trigger-function"  # Setting the Azure web app name
+      filePath: "services/FSTD.TimerTriggers"
+
+    steps:
+      - name: Set environment variables
+        run: echo "Repository name and Azure web app name set."
+
+  # Step 2: Build job (using a reusable workflow)
+  build:
+    needs: set-vars  # Depends on 'set-vars' job
+    uses: ./.github/workflows/reuse-build-svc.yml  # Reusing the build workflow
+    with:
+      repository_name: ${{ needs.set-vars.outputs.repository_name }}  # Pass the repository name
+      working_directory_path: ${{ needs.set-vars.outputs.filePath }}  # The working directory for the build
+    secrets: inherit  # Inheriting secrets like ACR credentials
+
+  # Step 3: Deploy job (using a reusable workflow)
+  deploy:
+    needs: [set-vars, build]  # Depends on 'set-vars' and 'build' jobs
+    uses: ./.github/workflows/reuse-deploy-svc.yml  # Reusing the deploy workflow
+    with:
+      azure_webapp_name: ${{ needs.set-vars.outputs.azure_webapp_name }}  # Azure web app name from 'set-vars'
+      image_tag: ${{ github.run_number }}  # Use the GitHub run number as the image tag
+      repo_name: ${{ needs.set-vars.outputs.repository_name }}  # Pass the repository name
+    secrets: inherit  # Inheriting secrets like Azure credentials

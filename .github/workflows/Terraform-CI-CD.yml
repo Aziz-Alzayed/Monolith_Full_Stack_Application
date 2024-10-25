@@ -1,0 +1,49 @@
+name: 'Terraform CI/CD'
+
+on:
+  # Trigger on pull request to specific folder
+  pull_request:
+    branches:
+      - main
+  # Trigger when a tag with "deploy-v" prefix is pushed
+  push:
+    tags:
+      - 'terraform-deploy-v*'
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_subscription_id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      TF_VAR_client_id: ${{ secrets.ARM_CLIENT_ID }}
+      TF_VAR_client_secret: ${{ secrets.ARM_CLIENT_SECRET }}
+      TF_VAR_tenant_id: ${{ secrets.ARM_TENANT_ID }}
+      TF_VAR_sql_server_login: ${{ secrets.SQL_SERVER_LOGIN }}
+      TF_VAR_sql_server_login_password: ${{ secrets.SQL_SERVER_PASSWORD }}
+
+    steps:
+    # Checkout code
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+
+    # Set up Terraform
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: latest
+
+    # Run Terraform Init for both CI and CD
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./terraform
+
+    # CI (build)
+    - name: Terraform Plan
+      run: terraform plan -input=false -out=tfplan
+      working-directory: ./terraform
+
+    # Conditional step for CD (deploy): only run Terraform Apply on tag push
+    - name: Terraform Apply
+      if: startsWith(github.ref, 'refs/tags/terraform-deploy-v')
+      run: terraform apply -auto-approve tfplan
+      working-directory: ./terraform

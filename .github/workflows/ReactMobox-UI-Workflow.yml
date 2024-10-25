@@ -1,0 +1,42 @@
+name: CI/CD Workflow for ReactMobox UI
+
+on:
+  workflow_dispatch:   # Enables manual triggering of the workflow
+  push:
+    branches:
+      - main
+    workflow_dispatch:
+
+jobs:
+  set-vars:
+    runs-on: ubuntu-latest
+    outputs:
+      repository_name: "fstd-frontend"   # Setting repository name for the build job
+      UI_BackEnd_API_URL: "https://fstd-app-service-backend.azurewebsites.net/api"  # Setting the Azure web app name
+      filePath: "./ui/ReactMobox"
+      azure_webapp_name: "fstd-app-service-frontend"
+    steps:
+      - name: Set environment variables
+        run: echo "Repository name and Azure web app name set."
+
+  # Build job for pull request and on merge to main
+  build:
+    needs: set-vars 
+    uses: ./.github/workflows/reuse-build-ui.yml  # Reuse the CI workflow
+    with:
+      repository_name: ${{ needs.set-vars.outputs.repository_name }}
+      working_directory_path: ${{ needs.set-vars.outputs.filePath }}
+      UI_BackEnd_API_URL: ${{ needs.set-vars.outputs.UI_BackEnd_API_URL }}
+    secrets:
+      inherit
+
+  # Deploy job - runs only when code is merged to main (push)
+  deploy:
+    needs: [set-vars, build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/reuse-deploy-ui.yml  # Reuse the CD workflow
+    with:
+      azure_webapp_name: ${{ needs.set-vars.outputs.azure_webapp_name }}
+      image_tag: ${{ github.run_number }}
+      repo_name: ${{ needs.set-vars.outputs.repository_name }}
+    secrets: inherit

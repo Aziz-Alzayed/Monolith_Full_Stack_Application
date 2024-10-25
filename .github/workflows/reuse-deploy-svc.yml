@@ -1,0 +1,37 @@
+# Required Inputs:
+# - azure_webapp_name: The name of your Azure Web App.
+# - image_tag: The tag of the image to be deployed.
+# - repo_name: The name of the repository in Azure Container Registry.
+
+name: Reusable Deploy .Net Docker Project
+
+on:
+  workflow_call:
+    inputs:
+      azure_webapp_name:
+        required: true
+        type: string
+      image_tag:
+        required: true
+        type: string
+      repo_name:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Service (Direct)
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ inputs.azure_webapp_name }}
+          images: ${{ secrets.ACR_LOGIN_SERVER }}/${{ inputs.repo_name }}:${{ inputs.image_tag }}
