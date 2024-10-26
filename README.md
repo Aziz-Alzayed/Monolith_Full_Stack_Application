@@ -94,3 +94,15 @@ terraform apply
 ## Conclusion
 
 This project follows modern architecture principles and leverages advanced technologies to ensure scalability, maintainability, and ease of deployment. With its robust **CQRS** structure, **SOLID** principles, and containerized infrastructure, it’s an excellent foundation for building scalable monolithic applications.
+
+## Contact
+For questions, suggestions, or feedback, feel free to reach out:
+- **Email:** aziz.alzayed@A-FiTech.com
+- **Website:** www.A-FiTech.com/about
+- **LinkedIn:** [LinkedIn Profile](https://www.linkedin.com/in/abdul-aziz-alzayed/)
+
+## License and Rights
+This project is licensed under the terms of the license specified in the LICENSE file. **All rights reserved by Aziz Alzayed**. Unauthorized reproduction, use, or modification of this code without prior permission is strictly prohibited.
+
+---
+Thank you for using and supporting **Monolith Full-Stack Application**!
