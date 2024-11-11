@@ -4,6 +4,7 @@ import styles from "./error-boundary.module.css";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
+  navigationPath: string | undefined
 }
 
 interface ErrorBoundaryState {
@@ -26,6 +27,13 @@ class ErrorBoundary extends React.Component<
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("ErrorBoundary caught an error", error, errorInfo);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+  componentWillReceiveProps(nextProps: Readonly<ErrorBoundaryProps>, nextContext: any): void {
+    if(this.state.hasError && this.props.navigationPath != nextProps.navigationPath){
+        this.setState({ hasError: false, error: undefined });
+    }
   }
 
   render() {
