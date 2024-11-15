@@ -25,7 +25,7 @@ import {
 import { getUserData, saveUserData } from "../user-utils/user-data-helper";
 import {
   RoutePaths,
-  useLanguageAwareNavigate,
+  languageAwareNavigate,
 } from "../../routing/use-language-aware-navigate";
 
 export const AuthContext = createContext<IAuthContextType>({
@@ -49,7 +49,6 @@ export const useAuth = (): IAuthContextType => {
 };
 
 const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
-  const navigateWithLanguage = useLanguageAwareNavigate();
   const [roles, setRoles] = useState<string[]>([]);
   const [user, setUser] = useState<IUserInfo | undefined>(getUserData());
 
@@ -80,7 +79,7 @@ const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       await logout(); // Clears the auth tokens
       setUser(undefined); // Reset user state
       setRoles([]); // Reset roles state
-      navigateWithLanguage(RoutePaths.home);
+      languageAwareNavigate(RoutePaths.home);
     } catch (error) {
       ErrorNotification(
         "Logout failed!",
@@ -105,7 +104,7 @@ const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
           setUser(undefined); // Invalidate the session if roles cannot be fetched
           setRoles([]); // Clear roles
           ErrorNotification("Session invalid! Unable to fetch roles.");
-          navigateWithLanguage(RoutePaths.login);
+          languageAwareNavigate(RoutePaths.login);
         }
       }
     };
