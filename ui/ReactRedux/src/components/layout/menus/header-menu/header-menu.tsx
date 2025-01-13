@@ -2,7 +2,6 @@ import { useState, useEffect, FC } from "react";
 import { Menu, Button, Space } from "antd";
 import { MenuFoldOutlined } from "@ant-design/icons"; // For the toggle button icon
 import UserDropdownMenu from "./user-dropdown-menu";
-import logoImage from "../../../../assets/images/Logo-White.png";
 import { Header } from "antd/es/layout/layout";
 import { DrawerMenu } from "./drawer-menu";
 import { MenuItemType } from "antd/es/menu/interface";
@@ -53,12 +52,6 @@ const HeaderMenu: FC = () => {
   return (
     <>
       <Header className={styles.headerStyle}>
-        <div
-          className={styles.logoDivStyle}
-          onClick={() => navigateWithLanguage(RoutePaths.home)}
-        >
-          <img src={logoImage} alt="Logo" className={styles.logoImageStyle} />
-        </div>
         {!isMobile ? (
           <>
             <Menu

@@ -6,8 +6,3 @@
 .layoutStyle {
     min-height: 100vh;
 }
-
-.mainContainerStyle {
-    margin-top: 4.5em;
-     transition: all 0.3s ease !important;
-}

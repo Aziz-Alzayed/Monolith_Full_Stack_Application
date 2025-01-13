@@ -13,7 +13,6 @@ export const addTaskApi = async (
   taskData: Omit<TaskModel, "id">
 ): Promise<AxiosResponse<any, any>> => {
   try {
-    console.log(taskData);
     return await postAuthRequest(`/tasks`, taskData);
   } catch (error) {
     console.error("Error in addTaskApi", error);

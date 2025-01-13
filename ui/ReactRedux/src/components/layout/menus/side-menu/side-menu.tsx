@@ -9,20 +9,17 @@ import { useTranslation } from "react-i18next";
 import { TranslationKeys } from "../../../../localization/translations/base-translation";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import styles from "./side-menu.module.css";
-import { RoutePaths, useLanguageAwareNavigate } from "../../../../routing/use-language-aware-navigate";
+import {
+  RoutePaths,
+  useLanguageAwareNavigate,
+} from "../../../../routing/use-language-aware-navigate";
+import logoImage from "../../../../assets/images/Logo-White.png";
 
-export const collapsedSideMenuWidth= "5em";
-export const SideMenuWidth = "13em";
-
-interface SideMenuProps {
-  collapsed: boolean;
-  setCollapsed: (collapsed: boolean) => void;
-}
-
-const SideMenu: FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
+const SideMenu: FC = () => {
   const { user } = useAuth();
   const location = useLocation();
   const [userIsAdmin, setUserIsAdmin] = useState<boolean>(false);
+  const [collapsed, setCollapsed] = useState<boolean>(false);
   const navigateWithLanguage = useLanguageAwareNavigate();
   const { t } = useTranslation();
 
@@ -57,13 +54,14 @@ const SideMenu: FC<SideMenuProps> = ({ collapsed, setCollapsed }) => {
   ) : (
     <Sider
       className={styles.sidebarStyle}
-      width={SideMenuWidth}
-      collapsedWidth={collapsedSideMenuWidth}
-      collapsible 
-      collapsed={collapsed} 
+      collapsible
+      collapsed={collapsed}
       onCollapse={setCollapsed}
-      trigger={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}  // Collapse button icons
+      trigger={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />} // Collapse button icons
     >
+      <div className={styles.sideMenuLogoDiv}>
+        <img src={logoImage} className={styles.sideMenuLogo} />
+      </div>
       <Menu
         mode="inline"
         selectedKeys={[currentSelectedKey]}
