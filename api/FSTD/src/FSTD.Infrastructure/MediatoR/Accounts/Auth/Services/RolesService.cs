@@ -23,7 +23,7 @@ namespace FSTD.Infrastructure.MediatoR.Accounts.Auth.Services
             // Filter out any roles not present in the validRoles list
             var validatedRoles = requestedRoles
             .Select(role => role.ToLower().Trim())
-            .Where(role => validRoles.Contains(role))
+            .Where(validRoles.Contains)
             .Distinct()
             .ToList();
 

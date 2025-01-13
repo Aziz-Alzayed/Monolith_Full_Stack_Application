@@ -86,22 +86,25 @@ namespace FSTD.Infrastructure.MediatoR.Accounts.Admins.Repos
         {
             try
             {
-                // Get current roles of the user
-                var currentRoles = await userManager.GetRolesAsync(user);
+                // Convert roles to uppercase for consistent comparison
+                var normalizedRoles = roles.Select(r => r.ToUpperInvariant()).ToList();
 
-                // Determine roles to add and remove
-                var rolesToAdd = roles.Except(currentRoles);
-                var rolesToRemove = currentRoles.Except(roles);
+                // Get current roles of the user and normalize them
+                var currentRoles = (await userManager.GetRolesAsync(user))
+                    .Select(r => r.ToUpperInvariant())
+                    .ToList();
+
+                // Determine roles to add and remove using case-insensitive comparison
+                var rolesToAdd = normalizedRoles.Except(currentRoles, StringComparer.OrdinalIgnoreCase);
+                var rolesToRemove = currentRoles.Except(normalizedRoles, StringComparer.OrdinalIgnoreCase);
 
                 // Add user to new roles
                 foreach (var role in rolesToAdd)
                 {
                     if (!await roleManager.RoleExistsAsync(role))
                     {
-                        // Optionally, create the role if it doesn't exist
-                        // var result = await roleManager.CreateAsync(new IdentityRole(role));
-                        // if (!result.Succeeded) continue; // Handle error or log
-                        continue; // Skip adding the user to a non-existent role
+                        // Skip adding the user to a non-existent role
+                        continue;
                     }
                     await userManager.AddToRoleAsync(user, role);
                 }
